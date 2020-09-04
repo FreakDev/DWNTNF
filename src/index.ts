@@ -30,7 +30,10 @@ function fullRandom() {
       state = addRecipe(state, rec)
   }
 
-  console.log('rnd', [...state.meals, ...state.shoppingList.map(i => `${i.id}=${i.qte}`)].toString(), `waste=${calcWasteScore(state)}`, "\n")
+  const waste = calcWasteScore(state)
+  // console.log('rnd', [...state.meals, ...state.shoppingList.map(i => `${i.id}=${i.qte}`)].toString(), `waste=${waste}`, "\n")
+
+  return waste
 }
 
 const α = 0.9; // learning rate
@@ -57,10 +60,25 @@ if (process.argv[2] === 't' && process.argv[3]) {
     policies
   })
 
-  for(let i=0; i<5; i++) {
-    m.play( (e: any) => console.log(format.episode(e)) );
-    fullRandom();
-  }  
+  const runs = []
+
+  for(let i=0; i<1000; i++) {
+    runs.push(
+      new Promise(res => {
+        m.play( (e: any) => { 
+          console.log(format.episode(e))
+          // res(format.getWaste(e))
+        })
+      })
+    )
+  }
+
+  // Promise.all(runs)
+  //   .then(ws => ws.map( w => [w, fullRandom()] ))
+  //   .then(r  => r.map( (d: any[]) => d[0] > d[1] ? [...d, 1] :  [...d, -1] ))
+  //   .then(r  => r.map( (d: any[]) => Math.min(d[0], d[1]) * 100 / Math.max(d[0], d[1]) * d[2] ))
+  //   .then((r:any[])  => r.reduce((a:number, b:number) => a + b) / r.length)
+  //   .then(r => console.log(r) )
 }
 
 
