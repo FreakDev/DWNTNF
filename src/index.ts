@@ -12,7 +12,9 @@ import act, { addRecipe } from './act';
 import { StateData } from './types';
 import * as fs from 'fs';
 
-const game = {actions, reward, final: final(5), act}
+const nbMeals = 5
+
+const game = {actions, reward, final: final(nbMeals), act}
 const initialState = createState({
   meals:[],
   shoppingList:[]
@@ -24,7 +26,7 @@ function fullRandom() {
     shoppingList: []
   }
 
-  while(state.meals.length != 5) {
+  while(state.meals.length != nbMeals) {
     const rec = recipes[Math.floor(Math.random() * recipes.length)]
     if (!state.meals.includes(rec.id))
       state = addRecipe(state, rec)
@@ -52,7 +54,11 @@ if (process.argv[2] === 't' && process.argv[3]) {
   fs.writeFileSync(process.argv[3], JSON.stringify(m.memoryState))
   console.log('done')
 } else {
-  const memoryState = JSON.parse(fs.readFileSync(process.argv[2]).toString())
+  const memoryFile = process.argv[3] || process.argv[2]
+
+  const statsMode = process.argv[3] && process.argv[2] === "s"
+
+  const memoryState = JSON.parse(fs.readFileSync(memoryFile).toString())
 
   const m = markov({
     game: {game, initialState},
@@ -62,23 +68,22 @@ if (process.argv[2] === 't' && process.argv[3]) {
 
   const runs = []
 
-  for(let i=0; i<1000; i++) {
+  for(let i=0; i < (statsMode ? 1000 : 1); i++) {
     runs.push(
       new Promise(res => {
         m.play( (e: any) => { 
-          console.log(format.episode(e))
-          // res(format.getWaste(e))
+          statsMode ? res(format.getWaste(e)) : console.log(format.episode(e))
         })
       })
     )
   }
+  
+  statsMode && 
+    Promise.all(runs)
+      .then(ws => ws.map( w => [w, fullRandom()] ))
+      .then(r  => r.map( (d: any[]) => d[0] > d[1] ? [...d, 1] :  [...d, -1] ))
+      .then(r  => r.map( (d: any[]) => Math.min(d[0], d[1]) * 100 / Math.max(d[0], d[1]) * d[2] ))
+      .then((r:any[])  => r.reduce((a:number, b:number) => a + b) / r.length)
+      .then(r => console.log(r) )
 
-  // Promise.all(runs)
-  //   .then(ws => ws.map( w => [w, fullRandom()] ))
-  //   .then(r  => r.map( (d: any[]) => d[0] > d[1] ? [...d, 1] :  [...d, -1] ))
-  //   .then(r  => r.map( (d: any[]) => Math.min(d[0], d[1]) * 100 / Math.max(d[0], d[1]) * d[2] ))
-  //   .then((r:any[])  => r.reduce((a:number, b:number) => a + b) / r.length)
-  //   .then(r => console.log(r) )
 }
-
-
