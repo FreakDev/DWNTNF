@@ -3,6 +3,7 @@ export interface IngredientRef {
   id: number
   name: string
   buyQte: number
+  unit: string
 }
 
 export interface IngredientInRecipe {
@@ -16,7 +17,7 @@ export interface ShoppingListItem {
 }
 
 export interface StateData {
-  meals: number[],
+  meals: number[]
   shoppingList: ShoppingListItem[]
 }
 
