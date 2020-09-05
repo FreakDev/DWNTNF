@@ -1,7 +1,6 @@
 {
-  "name": "mealplanner",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "dwntnf",
+  "version": "0.0.1",
   "author": "FreakDev <freakdev@gmail.com>",
   "license": "MIT",
   "dependencies": {
@@ -9,9 +8,16 @@
     "typescript": "^4.0.2"
   },
   "scripts": {
-    "start": "ts-node ./src/index.ts",
-    "upd": "npm remove markovts && npm install freakdev/markovts#master"
+    "start": "ts-node ./src/index.ts"
   },
+  "keywords": [
+    "markov",
+    "machine",
+    "reinforcement",
+    "learning",
+    "meal plan",
+    "food waste"
+  ],
   "devDependencies": {
     "@types/node": "^14.6.3",
     "ts-node": "^9.0.0"
